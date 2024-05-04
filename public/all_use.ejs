@@ -1,0 +1,122 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- connect -->
+<script>
+    const sockets = io("http://localhost:8080") 
+</script>
+
+<!-- index -->
+<script> 
+    // function sendmessing(){
+    //     const myi = document.getElementById('myi')
+    //     sockets.emit('sendmessing',myi.value)
+    //     myi.value = ""
+    // }
+    // function closeFloatingWindow(){
+    //   const floatingWindow = document.getElementById('floatingWindow')
+    //   document.getElementById('overlay').style.display='none'
+    // }
+    // function sendnow(event){
+    // event.preventDefault();
+    //  console.log(document.getElementById('quantity').value)
+    // }
+    // //-------------------------------------------------
+    // sockets.on("welcome",(data)=>{
+    //     const frist = document.getElementById("frist")
+    //     frist.innerText = data 
+    // })
+    // sockets.on('send_socket',(data)=>{
+    //     sockets.id = data
+    //     sockets.emit('get_socket',sockets.id)
+    // })
+    // sockets.on('getmessing',(data)=>{
+    //     const my_chat = document.createElement('div')
+    //     my_chat.innerHTML  =`<h3>${data}</h3>`
+    //     document.getElementById('chating').append(my_chat)
+    // })
+</script>
+
+<!-- add_product -->
+<script>
+    
+    sockets.on('create_pro_success',(data)=>{
+            Swal.fire({
+                title: "Add ptoduct success",
+                text:`You create product success`,
+                icon: "success"
+            });
+        
+    })
+    function create_pro(event){
+        event.preventDefault()
+        const pro_name = document.getElementById("productName")
+        const pro_de = document.getElementById("productDescription")
+        const pro_price = document.getElementById("productPrice")
+        if(pro_name.value != "" && pro_price.value != "" && pro_price.value > 0){
+            sockets.emit("create_pro",{name: pro_name.value,detail: pro_de.value,price:pro_price.value})
+        }else{
+            Swal.fire({
+            title: "Add ptoduct fail",
+            text: "Product's name,price can not be empty or 0",
+            icon: "error"
+            });
+        }
+    }
+
+    // function uploading(files) {
+    //   // Check if files were selected
+    //   if (files.length > 0) {
+    //     const file = files[0];
+        
+    //     // Read the file data
+    //     const reader = new FileReader();
+    //     reader.onload = function(event) {
+    //       const fileData = event.target.result;
+          
+    //       // Emit the file data to the server
+    //       sockets.emit("upload", { name: file.name, data: fileData }, (status) => {
+    //         console.log(status);
+    //       });
+    //     };
+    //     reader.readAsArrayBuffer(file);
+    //   }
+    // }
+    $(document).ready(()=>{
+    $('#create_pro_btn').click((e)=>{
+        e.preventDefault();
+        const pro_name = $('#productName').val()
+        const pro_price = $('#productPrice').val()
+        const pro_des = $('#productDescription').val()
+        const File = $('#get_pro_img').prop("files")[0]
+        console.log(typeof File)
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const fileData = event.target.result;
+          // Emit the file data to the server
+          sockets.emit("upload", { name: File.name, data: fileData,pro_name:pro_name,pro_price:pro_price,pro_des:pro_des }, (status) => {
+            console.log(status);
+          });
+        };
+        reader.readAsArrayBuffer(File);
+
+    })
+    })
+</script>
+
+
+
+<!-- all_check -->
+<script>
+    sockets.emit("check",1)
+    sockets.on('send_back',()=>{
+    window.location.href=`/login`
+  })
+  
+  function logout(){
+      sockets.emit('logout')
+  }
+  sockets.on('logout',()=>{
+    window.location.href=`/`
+  })
+</script>
